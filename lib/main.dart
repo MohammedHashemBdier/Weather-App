@@ -17,16 +17,17 @@ class WeatherApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      // theme: ThemeData(
-      //   primarySwatch: Provider.of<WeatherProvider>(context).weatherData == null
-      //       ? Colors.blue
-      //       : Provider.of<WeatherProvider>(context)
-      //           .weatherData!
-      //           .getThemeColor(),
-      // ),
-      home: HomePage(),
+      theme: ThemeData(
+        primarySwatch:
+            BlocProvider.of<WeatherCubit>(context).weatherModel == null
+                ? Colors.blue
+                : BlocProvider.of<WeatherCubit>(context)
+                    .weatherModel!
+                    .getThemeColor(),
+      ),
+      home: const HomePage(),
     );
   }
 }

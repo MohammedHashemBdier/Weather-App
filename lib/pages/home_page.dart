@@ -32,97 +32,163 @@ class HomePage extends StatelessWidget {
               child: CircularProgressIndicator(),
             );
           } else if (state is WeatherSuccessState) {
-            return Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    weatherData!.getThemeColor(),
-                    weatherData!.getThemeColor()[300]!,
-                    weatherData!.getThemeColor()[100]!,
-                  ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-              ),
+            weatherData = BlocProvider.of<WeatherCubit>(context).weatherModel;
+            return SuccessBody(weatherData: weatherData);
+          } else if (state is WeatherFailureState) {
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Spacer(
-                    flex: 3,
+                  const Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: Colors.red,
                   ),
+                  const SizedBox(height: 16),
                   const Text(
-                    "Provider.of<WeatherProvider>(context).cityName!,",
+                    'Oops! Something went wrong',
                     style: TextStyle(
-                      fontSize: 32,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  const SizedBox(height: 8),
                   Text(
-                    'updated at : ${weatherData!.date.hour.toString()}:${weatherData!.date.minute.toString()}',
-                    style: const TextStyle(
-                      fontSize: 22,
+                    'Unable to fetch weather data',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey[600],
                     ),
                   ),
-                  const Spacer(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Image.asset(weatherData!.getImage()),
-                      Text(
-                        weatherData!.temp.toInt().toString(),
-                        style: const TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Column(
-                        children: [
-                          Text('maxTemp :${weatherData!.maxTemp.toInt()}'),
-                          Text('minTemp : ${weatherData!.minTemp.toInt()}'),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const Spacer(),
-                  Text(
-                    weatherData!.weatherStateName,
-                    style: const TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Spacer(
-                    flex: 5,
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: () {
+                      BlocProvider.of<WeatherCubit>(context).getWeather(
+                        cityName:
+                            BlocProvider.of<WeatherCubit>(context).cityName ??
+                                '',
+                      );
+                    },
+                    child: const Text('Try Again'),
                   ),
                 ],
               ),
-            );
-          } else if (state is WeatherFailureState) {
-            return const Center(
-              child: Text('Error fetching weather data'),
             );
           } else {
-            return const Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'there is no weather 😔 start',
-                    style: TextStyle(
-                      fontSize: 30,
-                    ),
-                  ),
-                  Text(
-                    'searching now 🔍',
-                    style: TextStyle(
-                      fontSize: 30,
-                    ),
-                  )
-                ],
-              ),
-            );
+            return const DefaultBody();
           }
         },
+      ),
+    );
+  }
+}
+
+class DefaultBody extends StatelessWidget {
+  const DefaultBody({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'there is no weather 😔 start',
+            style: TextStyle(
+              fontSize: 30,
+            ),
+          ),
+          Text(
+            'searching now 🔍',
+            style: TextStyle(
+              fontSize: 30,
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class SuccessBody extends StatelessWidget {
+  const SuccessBody({
+    Key? key,
+    required this.weatherData,
+  }) : super(key: key);
+
+  final WeatherModel? weatherData;
+
+  @override
+  Widget build(BuildContext context) {
+    if (weatherData == null) {
+      return const Center(child: Text('No weather data available'));
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            weatherData!.getThemeColor(),
+            weatherData!.getThemeColor()[300] ?? Colors.blue[300]!,
+            weatherData!.getThemeColor()[100] ?? Colors.blue[100]!,
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Spacer(
+            flex: 3,
+          ),
+          Text(
+            BlocProvider.of<WeatherCubit>(context).cityName ?? 'Unknown City',
+            style: const TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            'updated at : ${weatherData!.date.hour.toString().padLeft(2, '0')}:${weatherData!.date.minute.toString().padLeft(2, '0')}',
+            style: const TextStyle(
+              fontSize: 22,
+            ),
+          ),
+          const Spacer(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Image.asset(weatherData!.getImage()),
+              Text(
+                '${weatherData!.temp.toInt()}°',
+                style: const TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Column(
+                children: [
+                  Text('Max: ${weatherData!.maxTemp.toInt()}°'),
+                  Text('Min: ${weatherData!.minTemp.toInt()}°'),
+                ],
+              ),
+            ],
+          ),
+          const Spacer(),
+          Text(
+            weatherData!.weatherStateName,
+            style: const TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const Spacer(
+            flex: 5,
+          ),
+        ],
       ),
     );
   }
