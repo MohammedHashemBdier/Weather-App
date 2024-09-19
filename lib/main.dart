@@ -17,6 +17,7 @@ class WeatherApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Provider.of<WeatherProvider>(context).weatherData == null
             ? Colors.blue
