@@ -32,8 +32,7 @@ class HomePage extends StatelessWidget {
               child: CircularProgressIndicator(),
             );
           } else if (state is WeatherSuccessState) {
-            weatherData = BlocProvider.of<WeatherCubit>(context).weatherModel;
-            return SuccessBody(weatherData: weatherData);
+            return SuccessBody(weatherData: state.weatherModel);
           } else if (state is WeatherFailureState) {
             return Center(
               child: Column(
@@ -84,29 +83,67 @@ class HomePage extends StatelessWidget {
 }
 
 class DefaultBody extends StatelessWidget {
-  const DefaultBody({
-    Key? key,
-  }) : super(key: key);
+  const DefaultBody({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'there is no weather 😔 start',
-            style: TextStyle(
-              fontSize: 30,
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              spreadRadius: 5,
+              blurRadius: 7,
+              offset: const Offset(0, 3),
             ),
-          ),
-          Text(
-            'searching now 🔍',
-            style: TextStyle(
-              fontSize: 30,
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.cloud_off,
+              size: 80,
+              color: Colors.grey[400],
             ),
-          )
-        ],
+            const SizedBox(height: 24),
+            Text(
+              'No Weather Data',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[800],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Search for a city to get started',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[600],
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return const SearchPage();
+                }));
+              },
+              icon: const Icon(Icons.search),
+              label: const Text('Search City'),
+              style: ElevatedButton.styleFrom(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                textStyle: const TextStyle(fontSize: 16),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
